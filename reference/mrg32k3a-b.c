@@ -30,6 +30,7 @@
      SE, 22-Mar-2002: interface changed
      SE, 25-Mar-2002: tested with Scheme 48 0.57 in c/srfi-27
      SE, 27-Mar-2002: cleaned
+     SE, 13-May-2002: bug found by Shiro Kawai removed
 */
 
 #include "scheme48.h" /* $SCHEME48/c/scheme48.h */
@@ -175,7 +176,7 @@ s48_value mrg32k3a_random_integer(s48_value state, s48_value range) {
     s48_raise_range_error(n, (long)1, m_max);
 
   /* generate result in {0..n-1} using the rejection method */
-  q  = m1 / (double)n;
+  q  = (double)( (unsigned long)(m1 / (double)n) );
   qn = q * n;
   do {
     x = mrg32k3a(&s);
@@ -213,3 +214,4 @@ void mrg32k3a_init(void) {
   S48_EXPORT_FUNCTION(mrg32k3a_random_integer);
   S48_EXPORT_FUNCTION(mrg32k3a_random_real);
 }
+
