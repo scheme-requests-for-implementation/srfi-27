@@ -34,7 +34,11 @@
 */
 
 #include "scheme48.h" /* $SCHEME48/c/scheme48.h */
+#include <sys/time.h>
 
+#ifndef NULL
+  #define NULL 0
+#endif
 /* maximum value for random_integer: min(S48_MAX_FIXNUM_VALUE, m1) */
 #define m_max (((long)1 << 29) - 1)
 
@@ -113,6 +117,9 @@ static double mrg32k3a(state_t *s) { /* (double), in {0..m1-1} */
 s48_value mrg32k3a_pack_state1(s48_value state) {
   s48_value result;
   state_t   s;
+  S48_DECLARE_GC_PROTECT(1);
+
+  S48_GC_PROTECT_1(state); /* s48_extract_integer may GC */
 
 #define REF(i) (double)s48_extract_integer(S48_VECTOR_REF(state, (long)(i)))
 
@@ -126,6 +133,8 @@ s48_value mrg32k3a_pack_state1(s48_value state) {
 
 #undef REF
 
+  S48_GC_UNPROTECT();
+
   /* box s into a Scheme object */
   result = S48_MAKE_VALUE(state_t);
   S48_SET_VALUE(result, state_t, s);
@@ -133,8 +142,11 @@ s48_value mrg32k3a_pack_state1(s48_value state) {
 }
 
 s48_value mrg32k3a_unpack_state1(s48_value state) {
-  s48_value result;
+  s48_value result = S48_UNSPECIFIC;
   state_t   s;
+
+  S48_DECLARE_GC_PROTECT(1);
+  S48_GC_PROTECT_1(result);
 
   /* unbox s from the Scheme object */
   s = S48_EXTRACT_VALUE(state, state_t);
@@ -156,6 +168,8 @@ s48_value mrg32k3a_unpack_state1(s48_value state) {
   SET(10, s.x22);
 
 #undef SET
+
+  S48_GC_UNPROTECT();
 
   return result;
 }
@@ -203,15 +217,24 @@ s48_value mrg32k3a_random_real(s48_value state) {
   return s48_enter_double(x);
 }
 
+/* Kludge for scsh */
+static s48_value current_time(void){
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  return s48_enter_integer(tv.tv_sec);
+}
+
+
 /* Exporting the C values to Scheme
    ================================
 */
 
-void mrg32k3a_init(void) {
+void s48_init_srfi_27(void) {
   S48_EXPORT_FUNCTION(mrg32k3a_pack_state1);
   S48_EXPORT_FUNCTION(mrg32k3a_unpack_state1);
   S48_EXPORT_FUNCTION(mrg32k3a_random_range);
   S48_EXPORT_FUNCTION(mrg32k3a_random_integer);
   S48_EXPORT_FUNCTION(mrg32k3a_random_real);
+  S48_EXPORT_FUNCTION(current_time);
 }
 
