@@ -31,100 +31,94 @@ the archive of the mailing list</a>.
 
 <UL>
 <LI>Draft: 2002/02/12-2002/04/12</LI>
+<LI>Revised: 2002/04/04
 </UL>
 
 <H1>Abstract</H1>
 
 This document specifies an interface to sources of random bits,
-or "random sources" for short.
+or "random sources" for brevity.
 In particular, there are three different ways to use the interface,
-with increasing demands on the quality of the source and the
+with varying demands on the quality of the source and the
 amout of control over the production process:
 
 <UL>
 <LI>
 The "no fuss" interface specifies that 
-<code>(random </code><I>n</I><code>)</code>
-produces a random integer <I>x</I> in {0, ..., <I>n</I>-1}.
-The details of how these random integers are produced may not be
+<code>(random-integer </code><I>n</I><code>)</code>
+produces the next random integer in {0, ..., <I>n</I>-1} and
+<code>(random-real)</code> produces the next random
+real number between zero and one.
+The details of how these random values are produced may not be
 very relevant, as long as they appear to be sufficiently random.
 <LI>
-For simulation purposes, however, it is necessary to know that
-the numbers are produced deterministically by a pseudo random 
-number generator and to have explicit access to its state.
-In addition, some simple form of true randomization can be useful 
-when simulations extend over more than one invocation of the
-entire Scheme system.
+For simulation purposes, on the contrary, it is usually necessary
+to know that the numbers are produced deterministically by a pseudo 
+random number generator of high quality and to have explicit access 
+to its state.
+In addition, one might want to use several independent sources of
+random numbers at the same time and it can be useful to have some
+simple form of randomization.
 <LI>
-Finally, security applications need a serious form of true randomization,
-in the sense that it is difficult for an adversary to exploit or
-introduce imperfections into the distribution of random secrets.
-However, as it would be unreasonable to require every implementation 
-to provide this level of quality, this feature is optional.
+For security applications a serious form of true randomization
+is essential, in the sense that it is difficult for an adversary to 
+exploit or introduce imperfections into the distribution of random bits.
+Moreover, the linear complexity of the stream of random bits is more 
+important than its statistical properties.
+In these applications, an entropy source (producing truely random
+bits at a low rate) is used to randomize a pseudo random number
+generator to increase the rate of available bits.
 </UL>
 <p>
-
-<H1>Rationale</H1>
-
-Random number generators are so common and important 
-that there is little to say here.
-There are some points that deserve attention, though:<p>
-
-The state of the art in pseudo random number generator 
-is still changing considerably.
-What was "good enough" yesterday may not pass as "ok" today.
-Therefore, it is important not to fix the method of production
-of the random bits beyond what is really necessary.<p>
-
-Even more important, the needs of an application with respect
-to the quality of the generator is often much higher than one
-is prepared to admit.
-Hence, one should happily take a performance penalty in
-exchange for peace of mind.
-(Whoever has been hit by a 'not good enough' random number generator
-will immediately understand what I am talking about.)
-Although not explicitly specified in this document, the quality of the
-random bits obtained through this interface should be <em>high</em>.<p>
-
-In particular, simple linear congruential random number generators
-have poor distribution properties in higher dimensions.
-In addition, there is one big potential pitfall: Reducing the
-the range using <code>modulo</code> may shorten the period of
-the generated sequence impressively.
-The interface specified in this document tries to save the
-user from this trap by requesting the implementor of this SRFI
-to provide the range reduction algorithm.
-And the reference implementation provides one, of course.<p>
-
-The morale here is that the person specifying the interface might 
-want to leave the choice of the generator to the implementor, and
-at the same time would like to encourage the use of a very good 
-generator because the user might not be able (or inclined) 
-to change it later, until it is too late.
 
 Once random sources provide the infrastructure to obtain 
 random bits, these can be used to construct other random deviates.
 Most important are floating point numbers of various distributions
 and random discrete structures, such as permutations or graphs.
-As there is an essentially unlimited number of such functions
-(with limited use elsewhere), we do not include them in this SRFI.
+As there is an essentially unlimited number of such objects (with 
+limited use elsewhere), we do not include them in this SRFI.
 In other words, this SRFI is <em>not</em> about making
-all sorts of random objects---it is about obtaining random bits 
-in a reliable and portable way.
-<p>
+all sorts of random objects---it is about obtaining random
+bits in a portable, flexible, reliable, and efficient way.
 
+<H1>Rationale</H1>
+
+This SRFI defines an interface for sources of random bits 
+computed by a pseudo random number generator.
+The interface provides range-limited integer and real numbers.
+It allows accessing the state of the underlying generator.
+Moreover, it is possible to obtain a large number of 
+independent generators and to invoke a mild form of true
+randomization.<p>
+
+The design aims at sufficient flexibility to cover the
+usage patterns of many applications as diverse as
+discrete structures, numerical simulations, and cryptographic protocols.
+At the same time, the interface aims at simplicity,
+which is important for occasional use.
+As there is no "one size fits all" random number generator,
+the design necessarily represents some form of compromise
+between the needs of the various applications.<p>
+
+Although strictly speaking not part of the specification,
+the emphasis of this proposal is on <em>high quality</em>
+random numbers and on <em>high performance</em>.
+As the state of the art in pseudo random number generators
+is still advancing considerably, the choice of method for
+the reference implementation should essentially be 
+considered preliminary.
 
 <H1>Specification</H1>
 
 <DL>
 
 <DT>
-<code>(random </code><I>n</I><code>) -> </code><I>x</I><code></code>
+<code>(random-integer </code><I>n</I><code>) -> </code><I>x</I><code></code>
 </DT>
 
 <DD>
-The next integer <I>x</I> in {0, ..., <I>n</I>-1} obtained
-by using <code>default-random-source</code>.
+The next integer <I>x</I> in {0, ..., <I>n</I>-1} 
+obtained from <code>default-random-source</code>.
 Subsequent results of this procedure appear to be independent
 uniformly distributed over the range {0, ..., <I>n</I>-1}.
 The argument <I>n</I> must be a positive integer,
@@ -136,19 +130,35 @@ otherwise an error is signalled.
 <DL>
 
 <DT>
+<code>(random-real) -> </code><I>x</I><code></code>
+</DT>
+
+<DD>
+The next number 0 < <I>x</I> < 1 obtained from
+<code>default-random-source</code>.
+Subsequent results of this procedure appear to be 
+independent uniformly distributed.
+The numerical type of the results and the 
+quantization of the output range depend on the implementation;
+refer to <code>random-source-make-reals</code> for details.
+</DD>
+
+</DL>
+
+<DL>
+
+<DT>
 <code>default-random-source</code>
 </DT>
 
 <DD>
-The random source used by <code>random</code>.
-In fact, it can be assumed that on initialization the following 
-definitions are evaluated:<br>
-<code>
-(define default-random-source (make-random-source))<br>
-(define random (random-integer-generator default-random-source))
-</code><br>
-but this is not mandatory, as long as the state of <code>random</code>
-can be obtained from <code>default-random-source</code>.
+A random source from which <code>random-integer</code> and 
+<code>random-real</code> have been derived using
+<code>random-source-make-integers</code> and
+<code>random-source-make-reals</code>.
+Note that an assignment to <code>default-random-source</code> 
+does not change <code>random</code> or <code>random-real</code>;
+it is also strongly recommended not to assign a new value.
 </DD>
 
 </DL>
@@ -166,6 +176,9 @@ order to create different types of random sources.
 A random source created with <code>make-random-source</code>
 represents a deterministic stream of random bits generated
 by some form of pseudo random number generator.
+Each random source obtained as <code>(make-random-source)</code>
+generates the same stream of values, unless the state is modified
+with one of the procedures below.
 </DD>
 
 </DL>
@@ -187,14 +200,15 @@ other types of objects.
 <DL>
 
 <DT>
-<code>(random-source-state </code><I>s</I><code>)  ->  </code><I>state</I><code></code><br>
-<code>(set-random-source-state! </code><I>s</I><code> </code><I>state</I><code>)</code>
+<code>(random-source-state-ref </code><I>s</I><code>)  ->  </code><I>state</I><code></code><br>
+<code>(random-source-state-set! </code><I>s</I><code> </code><I>state</I><code>)</code>
 </DT>
 
 <DD>
 Get and set the current state of a random source <I>s</I>.  The
 structure of the object <I>state</I> depends on the implementation;
-the only portable use of it is <code>set-random-source-state!</code>.
+the only portable use of it is as argument to 
+<code>random-source-state-set!</code>.
 It is, however, required that a state possess an external
 representation.
 </DD>
@@ -202,9 +216,8 @@ representation.
 </DL>
 
 <DL>
-
 <DT>
-<code>(randomize-random-source! </code><I>s</I><code>)</code>
+<code>(random-source-randomize! </code><I>s</I><code>)</code>
 </DT>
 
 <DD>
@@ -214,14 +227,32 @@ The actual quality of this randomization depends on the implementation
 but it can at least be assumed that the procedure sets <I>s</I> to a 
 different state for each subsequent run of the Scheme system.
 </DD>
-
 </DL>
-<p>
+
+<DL>
+<DT>
+<code>(random-source-pseudo-randomize! </code><I>s</I><code> <I>i</I> <I>j</I>)</code>
+</DT>
+
+<DD>
+Changes the state of the random source <I>s</I> into the initial
+state of the (<I>i</I>, <I>j</I>)-th independent random source,
+where <I>i</I> and <I>j</I> are non-negative integers.
+This procedure provides a mechanism to obtain a large number of 
+independent random sources (usually all derived from the same backbone
+generator), indexed by two integers.
+In contrast to <code>random-source-randomize!</code>,
+this procedure is entirely deterministic.
+</DD>
+</DL>
+
+
+<HR ALIGN=left WIDTH="10%">
 
 <DL>
 
 <DT>
-<code>(random-integer-generator </code><I>s</I><code>)  ->  </code><I>rand</I><code></code>
+<code>(random-source-make-integers </code><I>s</I><code>)  ->  </code><I>rand</I><code></code>
 </DT>
 
 <DD>
@@ -236,79 +267,411 @@ If an application obtains and uses several generators for the same
 random source <I>s</I>, a call to any of these generators advances 
 the state of <I>s</I>. Hence, the generators <em>do not</em> produce 
 the same sequence of random integers each but rather share a state.
+This also holds for all other types of generators derived from
+a fixed random sources.
 Implementations that support concurrency make sure that
 the state of a generator is properly advanced.<p>
-
-As far as this document is concerned, <code>random-integer-generator</code> 
-is the only way to get random bits from a random source.
-Extensions of the interface may define functions with names like
-<code>random-permutation-generator</code> or 
-<code>random-real-generator</code> to obtain generators for
-other random deviates than uniform integers from a finite range.
 </DD>
 
 </DL>
 
+<DL>
+
+<DT>
+<code>(random-source-make-reals </code><I>s</I><code>)  ->  </code><I>rand</I><code></code><br>
+<code>(random-source-make-reals </code><I>s</I><code> </code><I>unit</I><code>)  ->  </code><I>rand</I><code></code><br>
+</DT>
+
+<DD>
+Obtains a procedure <I>rand</I> to generate random real numbers
+0 < <I>x</I> < 1 using the random source <I>s</I>.
+The procedure <I>rand</I> is called without arguments.<p>
+
+The optional parameter <I>unit</I> determines the type of numbers
+being produced by <I>rand</I> and the quantization of the output.
+<I>Unit</I> must be a number such that 0 < <I>unit</I> < 1.
+The numbers created by <I>rand</I> are of the same numerical
+type as <I>unit</I> and the potential output values are
+spaced by at most <I>unit</I>. One can imagine <I>rand</I>
+to create numbers as <I>x</I>*<I>unit</I> where <I>x</I>
+is a random integer in {1, ..., floor(1/<I>unit</I>)-1}.
+Note, however, that this need not be the way the values
+are actually created and that the actual resolution of
+<I>rand</I> can be much higher than <I>unit</I>.
+In case <I>unit</I> is absent it defaults to a reasonably
+small value (related to the width of the mantissa of an
+efficient number format).
+</DD>
+
+</DL>
+
+
+<H1>Design Rationale</H1>
+
+<H3>Why not combine <code>random-integer</code> and
+<code>random-real</code>?</H3>
+
+The two procedures are not combined into a single variable-arity 
+procedures to save a little time and space during execution.
+Although some Scheme systems can deal with variable arity as
+efficiently as with fixed arity this is not always the case
+and time efficiency is very important here.
+
+<H3>Why not some object-oriented interface?</H3>
+
+There are many alternatives to the interface as specified in this SRFI. 
+In particular, every framework for object-orientation can be used to
+define a class for random sources and specify the interface for the
+methods on random sources.
+However, as the object-oriented frameworks differ considerably
+in terms of syntax and functionality, this SRFI does not make
+use of any particular framework.
+
+<H3>Why is there not just a generator with a fixed range?</H3>
+
+A bare fixed-range generator is of very limited use.
+Nearly every application has to add some functionality 
+to make use of the random numbers.
+The most fundamental task in manipulating 
+random numbers is to change the range and quantization.
+This is exactly what is provided by 
+<code>random-integer</code> and <code>random-real</code>.
+In addition, is saves the user from the pitfall of changing
+the range with a simple <code>modulo</code>-computation
+which may substantially reduce the quality of the
+numbers being produced.<p>
+
+The design of the interface is based on three prototype applications:
+<OL>
+<LI>
+Repeatedly choose from relatively small sets:
+As the size of the set is likely to vary from call to call,
+<code>random-integer</code> accepts a range argument <I>n</I> in every call.
+The implementation should try to avoid boxing/unboxing of values
+if the ranges fit into immediate integers.
+<LI>
+Generate a few large integers with a fixed number of bits:
+As generating the random number itself is expensive, 
+passing the range argument in every call does not hurt performance.
+Hence, the same interface as in the first application can be used.
+<LI>
+Generate real numbers:
+Unlike the choose-from-set case, 
+the range and the quantization is constant over a 
+potentially very large number of calls.
+In addition, there are usually just a few distinct instances of
+quantization and number type, most likely corresponding to
+underlying <code>float</code> and <code>double</code> 
+representations.
+Therefore,
+<code>random-real</code> does not accept any parameters but
+the procedure <code>random-source-make-reals</code> creates
+a properly configured <code>random-real</code> procedure.
+</OL>
+
+<H3>Why bother about floating point numbers at all?</H3>
+
+A proper floating point implementation of a random number generator
+is potentially much more efficient that an integer implementation
+because it can use more powerful arithmetics hardware.
+If in addition the application needs floating point random numbers
+it would be an intolerable waste to run an integer generator to
+produce floating point random numbers.
+A secondary reason is to save the user from the 'not as easy as
+it seems' task of converting an integer generator into a real 
+generator.
+
+<H3>Why are zero and one excluded from <code>random-real</code>?</H3>
+
+The procedure <code>random-real</code> does not return 
+<I>x</I> = 0 or <I>x</I> = 1 in order to allow 
+<code>(log </code><I>x</I><code>)</code> and 
+<code>(log (- 1 </code><I>x</I>)<code>)</code>
+without the danger of a numerical exception.
+
 <H1>Implementation</H1>
 
-The <a href="random.scm">reference implementation</a> 
-is based on Scheme according to the 
-<a href="http://www.schemers.org/Documents/Standards/R5RS/"><I>Revised^5 
-Report on the Algorithmic Language Scheme</I></a>.
-In addition, it requires
-<code>define-record-type</code> from 
-<a href="http://srfi.schemers.org/srfi-9/">SRFI-9</a>,
-<code>error</code> from 
-<a href="http://srfi.schemers.org/srfi-23/">SRFI-23</a>,
-and
-<code>current-time</code>, <code>time-second</code> and 
-<code>time-nanosecond</code> from
+<H3>Choice of generator</H3>
+
+The most important decision about the implementation is 
+the choice of the random number generator.
+The basic principle here is: <em>Let quality prevail!</em>
+In the end, a performance penalty of a better generator may be 
+a cheap price to pay for some avoided catastrophes.
+It may be unexpected, but I have also seen many examples
+where the better generator was also the faster.
+Simple linear congruential generator cannot be recommended
+as they tend to be ill-behaved in several ways.<p>
+
+For this reason, my initial proposal was George Marsaglia's
+COMBO generator, which is the combination of a 32-bit 
+multiplicative lagged Fibonacci-generator with a 16-bit
+multiply with carry generator.
+The COMBO generator passes all tests of Marsaglia's
+<a href="http://stat.fsu.edu/~geo/diehard.html">DIEHARD</a>
+testsuite for random number generators and has
+a period of order 2^60.<p>
+
+As an improvement, Brad Lucier suggested
+<a href="http://srfi.schemers.org/srfi-27/mail-archive/msg00000.html">suggested</a>
+Pierre L'Ecuyer's
+<a href="http://www.iro.umontreal.ca/~lecuyer/myftp/papers/combmrg2.ps">MRG32k3a</a>
+generator which is combination of two recursive generators
+of degree three, both of which fit into 54-bit arithmetics.
+The MRG32k3a generator also passes DIEHARD and in addition,
+has desireable spectral properties and a period in the
+order of 2^191.
+As a matter of fact, multiple recursive generators (MRGs) are 
+theoretically much better understood than special constructions
+as the COMBO generator.
+This is the reason why the implementations provided here
+implements the MRG32k3a generator.
+When implemented in floating point arithmetics with sufficient
+mantissa-width, this generator is also very fast.<p>
+
+<H3>Choice of arithmetics</H3>
+
+The next important decision about the implementation is
+the type of arithmetics to be used.
+The choice is difficult and depends heavily on the
+underlying Scheme system and even on the underlying
+hardware platform and architecture.
+For the MRG32k3a generator, use 64-bit arithmetics if you 
+really have it. If not, use a floating point ALU if
+it gives you 54 or more bits of mantissa.
+And if you do not have floats either, then at least
+try to make sure you work with immediate integers
+(instead of allocated objects).
+Unfortunately, there is no portable way in Scheme to
+find out about native and emulated arithmetics.<p>
+
+As performance is critical to many applications, 
+one might want to implement the actual
+generator itself in native code.
+For this reason, I provide three different 
+implementations of the backbone generator 
+as a source of inspiration.
+See the code below.
+
+<H3>Data Type for Random Sources</H3>
+
+An important aspect of the specification in this SRFI
+is that random sources are objects of a distinct type.
+Although this is straight-forward and available in nearly
+every Scheme implementation, there is no portable way 
+to do this at present.
+One way to define the record type is to use 
+<a href="http://srfi.schemers.org/srfi-9/">SRFI-9</a>.<p>
+
+The reference implementations below define a record
+type to contain the exported procedures.
+The actual state of the generator is stored in the
+binding time environment of <code>make-random-source</code>.
+This has the advantage that access to the state is fast
+even if the record type would be slow (which need not be
+the case).
+
+<H3>Entropy Source for Randomization</H3>
+
+Another problematic part of the specification with respect
+to portability is <code>random-source-randomize!</code> as
+it needs access to a real entropy source.<p>
+
+A reasonable choice for such as source is to use the system
+clock in order to obtain a value for randomization, for example
+in the way John David Stone recommends (see reference below).
+This is good enough for most applications with the 
+notable exception of security related programs.
+One way to obtain the time in Scheme is to use 
 <a href="http://srfi.schemers.org/srfi-19/">SRFI-19</a>.<p>
 
-The random number generator implemented is the 
-<EM>COMBO</EM> generator as proposed by G. Marsaglia.
-The generator is a combination of a 32-bit multiplicative lagged 
-Fibonnaci generator and a 16-bit multiply-with-carry generator.
-The generator passes all tests of the 
-<a href="http://stat.fsu.edu/~geo/diehard.html"><em>DIEHARD</em></a>
-testsuite by G. Marsaglia and is very efficient if it
-is implemented with genuine 16/32-bit arithmetics.
-Of course, the reference implementation is portable
-and therefore simply uses <code>integer</code> arithmetics
-(which probably uses boxed values for 32-bit integers).<p>
+<H3>Implementation of the specified interface</H3>
 
-The external representation of the state of a generator is
-<code>(marsaglia-combo </code><I>x1</I> <I>x0</I> <I>y</I><code>)</code>,
-where <I>x1</I>, <I>x0</I>, and <I>y</I> are integers
-describing the state of the generator.<p>
+Once the portability issues are resolved, 
+one can provide the remaining functionality as 
+specified in this SRFI document.<p>
 
-To provide the datatype for random sources,
-a record type is defined which contains the operations
-in its fields. 
-The state of the generator is not stored in fields of
-the random source record but is stored within the binding
-time scope of the <code>make-random-source</code> operation.
-This allows a simpler (and probably more efficient) way
-of advancing the state.<p>
+For the reference implementation, a relatively large part
+of the code deals with the more advanced features of the 
+MRG32k3a generator, 
+in particular <code>random-source-pseudo-randomize!</code>.
+This code is inspired by Pierre L'Ecuyer's own implementation
+of the MRG32k3a generator.<p>
 
-The largest and most difficult part of the reference implementation
-deals with the issue of producing integers for different ranges.
-Try <code>(random (expt 10 1000))</code> and <code>(random 2)</code>
-for a start.
+Another part of this generic code deals with changing
+the range and quantization of the random numbers and
+with error checking to detect common mistakes and abuses.<p>
 
-<H1>Confidence Tests</H1>
+<H3>Implementation Examples</H3>
 
-In addition to the reference implementation, there is a small
-collection of <a href="conftest.scm">confidence tests</a>
+<a href="reference">Here</a> are three alternative implementations of the SRFI.
+(<a href="srfi-27-reference.tar.gz">Here</a> are all files, tar-gzipped, 13020 bytes.)
+Keep in mind that a SRFI is a "request for implementation",
+which means these implementations are merely examples
+to illustrate the specification and inspire people to implement 
+it better and faster. 
+The performance figures below are rough indications measured
+on a Pentium3, 800 Mhz, Linux; <i>x</i> int/s, <i>y</i> real/s
+means <code>(random-integer 2)</code> can be computed about <i>x</i>
+times a second and <code>(random-real)</code> about <i>y</i> times a second.
+The implementations are
+
+<OL type="a">
+
+<LI> for Scheme 48 0.57, using 54-bit <code>integer</code> only.
+This implementation aims at portability, not at performance
+(30000 ints/s, 3000/s reals/s).
+
+<LI> for Scheme 48 0.57 with the core generator being implemented 
+in C using <code>(double)</code>-arithmetics.
+The generator is made available in Scheme 48 via the
+<a href="http://s48.org/0.57/manual/s48manual_52.html">C/Scheme 
+interface</a>.
+The performance of this generator is good
+(160000 ints/s, 180000 reals/s).
+
+<LI> for Gambit 3.0, using <code>flonum</code> and 
+54-bit <code>integer</code>.
+This code is inspired by a program by Brad Lucier as 
+<a href="http://srfi.schemers.org/srfi-27/mail-archive/msg00000.html">posted</a>
+to the discussion archive of this SRFI.
+The performance of this generator is good for reals
+(5000 ints/s, 20000/s reals/s when interpreted,
+6500 ints/s, 50000/s reals/s when compiled).
+
+</OL>
+
+In addition to the implementations there is a small
+collection of <a href="srfi-27/conftest.scm">confidence tests</a>
 for the interface specified.
 The tests merely check a few assertions expressed by the specification.
-It is not the intention to provide a conclusive and complete test
-of the implementation here.
-In addition, there is an interface to write random bits to
-a file in a way readable by the <em>DIEHARD</em> testsuite.
-This makes it easier for implementors to put their favorite
-generator to the test.
+It is not the intention to provide a complete test of the interface here.
+It is even less the intention to provide statistical tests of the
+generator itself.
+However, there is a function to write random bits from
+the generators to a file in a way readable by the <em>DIEHARD</em> 
+testsuite. This makes it easier for implementors to find out
+about their favorite generators and check their implementation.<p>
 
+
+
+<H1>Recommended Usage Patterns</H1>
+
+Unless the functionality defined in this SRFI is sufficient,
+an application has to implement more procedures to construct
+other random deviates.
+This section contains some recommendation 
+on how to do this technically by presenting
+examples of increasing difficulty 
+with respect to the interface.
+Note that the code below is not part of the specification,
+it is merely meant to illustrate the spirit
+
+<H3>Generating Random Permutations</H3>
+
+The following code defines procedures to generate random 
+permutations of the set {0, ..., <I>n</I>-1}.
+Such a permutation is represented by a <code>vector</code> 
+of length <I>n</I> for the images of the points.<p>
+
+Observe that the implementation first defines the procedure 
+<code>random-source-make-permutations</code> to
+turn a random source <I>s</I> into a procedure to generate
+permutations of given degree <I>n</I>.
+In a second step, this is applied to the default source
+to define a ready-to-use procedure for permutations:
+<code>(random-permutation </code><I>n</I><code>)</code>
+constructs a random permutation of degree <I>n</I>.
+
+<code><pre>
+(define (random-source-make-permutations s)
+  (let ((rand (random-source-make-integers s)))
+    (lambda (n)
+      (let ((x (make-vector n 0)))
+	(do ((i 0 (+ i 1)))
+	    ((= i n))
+	  (vector-set! x i i))
+	(do ((k n (- k 1)))
+	    ((= k 1) x)
+	  (let* ((i (- k 1))
+		 (j (rand k))
+		 (xi (vector-ref x i))
+		 (xj (vector-ref x j)))
+	    (vector-set! x i xj)
+	    (vector-set! x j xi)))))))
+
+(define random-permutation
+  (random-source-make-permutations default-random-source))
+</pre></code>
+
+For the algorithm refer to Knuth's "The Art of Computer Programming",
+Vol. II, 2nd ed., Algorithm P of Section 3.4.2.
+
+<H3>Generating Exponentially-Distributed Random Numbers</H3>
+
+The following code defines procedures to generate exponentially
+Exp(mu)-distributed random numbers.
+The technical difficulty of the interface addressed here is
+how to pass optional arguments to <code>random-source-make-reals</code>.
+
+<code><pre>
+(define (random-source-make-exponentials s . unit)
+  (let ((rand (apply random-source-make-reals s unit)))
+    (lambda (mu)
+      (- (* mu (log (rand)))))))
+
+(define random-exponential
+  (random-source-make-exponentials default-random-source))
+</pre></code>
+
+The algorithm is folklore. Refer to Knuth's "The Art of Computer 
+Programming", Vol. II, 2nd ed., Section 3.4.1.D.
+
+<H3>Generating Normally-Distributed Random Numbers</H3>
+
+The following code defines procedures to generate 
+normal N(mu, sigma)-distributed real numbers using 
+the polar method.<p>
+
+The technical difficulty of the interface addressed here
+is that the polar method generates two results per computation.
+We return one of the result and store the second one to be 
+returned by the next call to the procedure.
+Note that this implies that <code>random-source-state-set!</code>
+(and the other procedures modifying the state) does not necessarily
+affect the output of <code>random-normal</code> immediately!
+
+<code><pre>
+(define (random-source-make-normals s . unit)
+  (let ((rand (apply random-source-make-reals s unit))
+	(next #f))
+    (lambda (mu sigma)
+      (if next
+	  (let ((result next))
+	    (set! next #f)
+	    (+ mu (* sigma result)))
+	  (let loop ()
+	    (let* ((v1 (- (* 2 (rand)) 1))
+		   (v2 (- (* 2 (rand)) 1))
+		   (s (+ (* v1 v1) (* v2 v2))))
+	      (if (>= s 1)
+		  (loop)
+		  (let ((scale (sqrt (/ (* -2 (log s)) s))))
+		    (set! next (* scale v2))
+		    (+ mu (* sigma scale v1))))))))))
+
+(define random-normal
+  (random-source-make-normals default-random-source))
+</pre></code>
+
+For the algorithm refer to Knuth's "The Art of Computer Programming",
+Vol. II, 2nd ed., Algorithm P of Section 3.4.1.C.
+
+<H1>Acknowledgements</H1>
+
+I would like to thank all people who have participated in the discussion,
+in particular Brad Lucier and Pierre l'Ecuyer.
+Their contributions have greatly improved this SRFI.
 
 <H1>References</H1>
 
@@ -317,7 +680,7 @@ generator to the test.
 <LI>
        G. Marsaglia: 
        Diehard -- Testsuite for Random Number Generators. 
-       <a href="http://stat.fsu.edu/~geo/diehard.html">http://stat.fsu.edu/~geo/diehard.html</a>
+       <a href="http://stat.fsu.edu/~geo/diehard.html">stat.fsu.edu/~geo/diehard.html</a>
        (Also contains some generators that do pass Diehard.)
 </LI>
 
@@ -327,6 +690,33 @@ generator to the test.
        Volume II Seminumerical Algorithms.
        2nd ed. Addison-Wesley, 1981.
        (The famous chapter on random number generators.)
+</LI>
+
+<LI>
+       P. L'Ecuyer:
+       "Software for Uniform Random Number Generation:
+       Distinguishing the Good and the Bad",
+       Proceedings of the 2001 Winter Simulation Conference, 
+       IEEE Press, Dec. 2001, 95--105.
+       <a href="http://www.iro.umontreal.ca/~lecuyer/myftp/papers/wsc01rng.pdf">www.iro.umontreal.ca/~lecuyer/myftp/papers/wsc01rng.pdf</a>
+       (Profound discussion of random number generators.)
+</LI>
+
+<LI>
+       P. L'Ecuyer:
+       "Good Parameter Sets for Combined Multiple Recursive
+       Random Number Generators", 
+       Shorter version in Operations Research, 47, 1 (1999), 159--164.
+       <a href="http://www.iro.umontreal.ca/~lecuyer/myftp/papers/combmrg2.ps">www.iro.umontreal.ca/~lecuyer/myftp/papers/combmrg2.ps</a>
+       (Actual numbers for good generators.)
+</LI>
+
+<LI>
+       P. L'Ecuyer:
+       "Software for Uniform Random Number Generation:
+       Distinguishing the Good and the Bad",
+       Proceedings of the 2001 Winter Simulation Conference, 
+       IEEE Press, Dec. 2001, 95--105.
 </LI>
 
 <LI>
@@ -426,7 +816,7 @@ PARTICULAR PURPOSE.
     <address>Author: <a href="mailto:sebastian.egner@philips.com">Sebastian Egner</a></address>
 <!-- Created: Mon Feb 4 18:17 EST 2002 -->
 <!-- hhmts start -->
-Last modified: Tue Feb 12 11:31:01 MET 2002
+Last modified: Tue Apr  9 10:16:59 MST 2002
 <!-- hhmts end -->
   </body>
 </html>==
