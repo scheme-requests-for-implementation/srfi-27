@@ -1,7 +1,7 @@
 REFERENCE IMPLEMENTATIONS FOR SRFI-27 "Sources of Random Bits"
 ==============================================================
 
-Sebastian.Egner@philips.com, 27-Mar-2002.
+Sebastian.Egner@philips.com, 10-Apr-2002.
 
 Files
 -----
@@ -62,6 +62,6 @@ c) A Scheme-only implementation for Gambit 3.0:
 
    This implementation is meant as an example for a realistic
    Scheme implementation using flonums in Scheme and no C-code.
-   Performance is acceptable when the code is used in compiled form;
-   the implementation here is about 10% slower than the one posted
-   to SRFI-27 discussion forum by Brad Lucier.
+   Performance is good when the code is used in compiled form;
+   the implementation has been optimized by Brad Lucier. This
+   has resulted in a subtantial performance gain.

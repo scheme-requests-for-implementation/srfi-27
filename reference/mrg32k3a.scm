@@ -1,7 +1,7 @@
 ; GENERIC PART OF MRG32k3a-GENERATOR FOR SRFI-27
 ; ==============================================
 ;
-; Sebastian.Egner@philips.com, Mar-2002.
+; Sebastian.Egner@philips.com, 2002.
 ;
 ; This is the generic R5RS-part of the implementation of the MRG32k3a
 ; generator to be used in SRFI-27. It is based on a separate implementation
@@ -17,6 +17,7 @@
 ;   SE, 22-Mar-2002: refactored from earlier versions
 ;   SE, 25-Mar-2002: pack/unpack need not allocate
 ;   SE, 27-Mar-2002: changed interface to core generator
+;   SE, 10-Apr-2002: updated spec of mrg32k3a-random-integer
 
 ; Generator
 ; =========
@@ -90,6 +91,8 @@
 ;      step because we use the rejection method to avoid any problems 
 ;      with distribution anomalies.
 ;        The range argument must be an exact integer in {1..m-max}.
+;      It can be assumed that range is a fixnum if the Scheme system
+;      has such a number representation.
 ;
 ;   (mrg32k3a-random-real packed-state) -> x in (0,1)
 ;      advance the state of the generator and return the next random

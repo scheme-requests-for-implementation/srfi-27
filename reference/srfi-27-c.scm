@@ -15,6 +15,14 @@
 ;
 ; history of this file:
 ;   SE, 25-Mar-2002: initial version
+;   SE, 10-Apr-2002: incorporated Brad Lucier's optimizations
+
+(declare ; from Brad Lucier
+ (standard-bindings)
+ (extended-bindings)
+ (block)
+ (not safe))
+
 
 (define-structure :random-source
   state-ref

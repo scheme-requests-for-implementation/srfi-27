@@ -33,8 +33,9 @@
 ;
 ; compiling a simple program in Gambit 3.0 (compiler) using this file:
 ;
-;   1. create 'a.scm' with content
+;   1. create 'a.scm' with content;
 ;     (include "srfi-27-c.scm")
+;     (time (do ((k 0 (+ k 1))) ((= k 1000000)) (random-integer 2)))
 ;     (time (do ((k 0 (+ k 1))) ((= k 1000000)) (random-real)))
 ;   2. compile Scheme into C (verbose paths for clarity)
 ;     GAMBCDIR=$GAMBIT/lib LD_LIBRARY_PATH=$GAMBIT/lib $GAMBIT/gsc/gsc a
@@ -47,11 +48,11 @@
 ;
 ;   (time (do ((k 0 (+ k 1))) ((= k 100000)) (random-integer 2)))
 ;   ; about 5000/s on P3@800MHz, interpreted
-;   ; about 6500/s on P3@800MHz, compiled
+;   ; about 200000/s on P3@800MHz, compiled
 ;
 ;   (time (do ((k 0 (+ k 1))) ((= k 100000)) (random-real)))
-;   ; about 20000/s on P3@800MHz, interpreted
-;   ; about 50000/s on P3@800MHz, compiled
+;   ; about 25000/s on P3@800MHz, interpreted
+;   ; about 400000/s on P3@800MHz, compiled
 ;
 ; history of this file:
 ;   SE, 19-Mar-2002: initial version, based on earlier tests

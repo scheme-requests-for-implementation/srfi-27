@@ -32,6 +32,7 @@ the archive of the mailing list</a>.
 <UL>
 <LI>Draft: 2002/02/12-2002/04/12</LI>
 <LI>Revised: 2002/04/04
+<LI>Revised: 2002/04/10
 </UL>
 
 <H1>Abstract</H1>
@@ -505,7 +506,7 @@ with error checking to detect common mistakes and abuses.<p>
 <H3>Implementation Examples</H3>
 
 <a href="reference">Here</a> are three alternative implementations of the SRFI.
-(<a href="srfi-27-reference.tar.gz">Here</a> are all files, tar-gzipped, 13020 bytes.)
+(<a href="srfi-27-reference.tar.gz">Here</a> are all files, tar-gzipped, 13072 bytes.)
 Keep in mind that a SRFI is a "request for implementation",
 which means these implementations are merely examples
 to illustrate the specification and inspire people to implement 
@@ -535,14 +536,15 @@ The performance of this generator is good
 This code is inspired by a program by Brad Lucier as 
 <a href="http://srfi.schemers.org/srfi-27/mail-archive/msg00000.html">posted</a>
 to the discussion archive of this SRFI.
-The performance of this generator is good for reals
-(5000 ints/s, 20000/s reals/s when interpreted,
-6500 ints/s, 50000/s reals/s when compiled).
+The performance of this generator is good when compiled
+(5000 ints/s, 25000/s reals/s when interpreted,
+200000 ints/s, 400000/s reals/s when compiled;
+see acknowledgements).
 
 </OL>
 
 In addition to the implementations there is a small
-collection of <a href="reference/conftest.scm">confidence tests</a>
+collection of <a href="srfi-27/conftest.scm">confidence tests</a>
 for the interface specified.
 The tests merely check a few assertions expressed by the specification.
 It is not the intention to provide a complete test of the interface here.
@@ -671,7 +673,8 @@ Vol. II, 2nd ed., Algorithm P of Section 3.4.1.C.
 
 I would like to thank all people who have participated in the discussion,
 in particular Brad Lucier and Pierre l'Ecuyer.
-Their contributions have greatly improved this SRFI.
+Their contributions have greatly improved the design of this SRFI.
+Moreover, Brad has optimized the Gambit implementation quite substantially.
 
 <H1>References</H1>
 
@@ -816,7 +819,7 @@ PARTICULAR PURPOSE.
     <address>Author: <a href="mailto:sebastian.egner@philips.com">Sebastian Egner</a></address>
 <!-- Created: Mon Feb 4 18:17 EST 2002 -->
 <!-- hhmts start -->
-Last modified: Tue Apr  9 10:23:51 MST 2002
+Last modified: Wed Apr 10 15:44:02 MST 2002
 <!-- hhmts end -->
   </body>
-</html>==
+</html>
