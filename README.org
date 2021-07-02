@@ -6,6 +6,8 @@
 
 keywords: [[https://srfi.schemers.org/?keywords=randomness][Randomness]]
 
+library-name: random-bits
+
 This repository hosts [[https://srfi.schemers.org/srfi-27/][SRFI 27]]: Sources of Random Bits, a [[https://srfi.schemers.org/][Scheme Request for Implementation]].
 
 This SRFI is in /final/ status.
