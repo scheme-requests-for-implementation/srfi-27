@@ -106,7 +106,7 @@ considered preliminary.
 
 <DL>
 
-<DT>
+<DT id="random-integer">
 <code>(random-integer </code><I>n</I><code>) -> </code><I>x</I><code></code>
 </DT>
 
@@ -123,7 +123,7 @@ otherwise an error is signalled.
 
 <DL>
 
-<DT>
+<DT id="random-real">
 <code>(random-real) -> </code><I>x</I><code></code>
 </DT>
 
@@ -141,7 +141,7 @@ refer to <code>random-source-make-reals</code> for details.
 
 <DL>
 
-<DT>
+<DT id="default-random-source">
 <code>default-random-source</code>
 </DT>
 
@@ -159,7 +159,7 @@ it is also strongly recommended not to assign a new value.
 <HR ALIGN=left WIDTH="10%">
 <DL>
 
-<DT>
+<DT id="make-random-source">
 <code>(make-random-source) -> </code><I>s</I><code></code>
 </DT>
 
@@ -179,7 +179,7 @@ with one of the procedures below.
 
 <DL>
 
-<DT>
+<DT id="random-source-p">
 <code>(random-source? </code><I>obj</I><code>)  ->  </code><I>bool</I><code></code>
 </DT>
 
@@ -193,7 +193,7 @@ other types of objects.
 
 <DL>
 
-<DT>
+<DT id="random-source-state-ref">
 <code>(random-source-state-ref </code><I>s</I><code>)  ->  </code><I>state</I><code></code><br>
 <code>(random-source-state-set! </code><I>s</I><code> </code><I>state</I><code>)</code>
 </DT>
@@ -210,7 +210,7 @@ representation.
 </DL>
 
 <DL>
-<DT>
+<DT id="random-source-randomize!">
 <code>(random-source-randomize! </code><I>s</I><code>)</code>
 </DT>
 
@@ -224,7 +224,7 @@ different state for each subsequent run of the Scheme system.
 </DL>
 
 <DL>
-<DT>
+<DT id="random-source-pseudo-randomize!">
 <code>(random-source-pseudo-randomize! </code><I>s</I><code> <I>i</I> <I>j</I>)</code>
 </DT>
 
@@ -245,7 +245,7 @@ this procedure is entirely deterministic.
 
 <DL>
 
-<DT>
+<DT id="random-source-make-integers">
 <code>(random-source-make-integers </code><I>s</I><code>)  ->  </code><I>rand</I><code></code>
 </DT>
 
@@ -271,7 +271,7 @@ the state of a generator is properly advanced.<p>
 
 <DL>
 
-<DT>
+<DT id="random-source-make-reals">
 <code>(random-source-make-reals </code><I>s</I><code>)  ->  </code><I>rand</I><code></code><br>
 <code>(random-source-make-reals </code><I>s</I><code> </code><I>unit</I><code>)  ->  </code><I>rand</I><code></code><br>
 </DT>
