@@ -1,23 +1,21 @@
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
-<html>
+<html lang="en">
   <head>
     <title>SRFI 27: Sources of Random Bits</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="/srfi.css" type="text/css" />
+    <link rel="stylesheet" href="https://srfi.schemers.org/srfi.css" type="text/css" />
+    <link href="/favicon.png" rel="icon" sizes="192x192" type="image/png">
   </head>
 
   <body>
 
-<H1>Title</H1>
 
-Sources of Random Bits
+<h1><a href="https://srfi.schemers.org/"><img class="srfi-logo" src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI surfboard logo" /></a>27: Sources of Random Bits</h1>
 
-<H1>Author</H1>
+<p>by Sebastian Egner</p>
 
-Sebastian Egner
-
-<H1>Status</H1>
+<h2>Status</h2>
 
 <p>This SRFI is currently in <em>final</em> status.  Here is <a href="https://srfi.schemers.org/srfi-process.html">an explanation</a> of each status that a SRFI can hold.  To provide input on this SRFI, please send email to <code><a href="mailto:srfi+minus+27+at+srfi+dotschemers+dot+org">srfi-27@<span class="antispam">nospam</span>srfi.schemers.org</a></code>.  To subscribe to the list, follow <a href="https://srfi.schemers.org/srfi-list-subscribe.html">these instructions</a>.  You can access previous messages via the mailing list <a href="https://srfi-email.schemers.org/srfi-27">archive</a>.</p>
 <UL>
@@ -28,7 +26,7 @@ Sebastian Egner
 <LI>Final: 2002-06-03
 </UL>
 
-<H1>Abstract</H1>
+<h2>Abstract</h2>
 
 This document specifies an interface to sources of random bits,
 or "random sources" for brevity.
@@ -75,7 +73,7 @@ In other words, this SRFI is <em>not</em> about making
 all sorts of random objects---it is about obtaining random
 bits in a portable, flexible, reliable, and efficient way.
 
-<H1>Rationale</H1>
+<h2>Rationale</h2>
 
 This SRFI defines an interface for sources of random bits 
 computed by a pseudo random number generator.
@@ -102,7 +100,7 @@ is still advancing considerably, the choice of method for
 the reference implementation should essentially be 
 considered preliminary.
 
-<H1>Specification</H1>
+<h2>Specification</h2>
 
 <DL>
 
@@ -300,7 +298,7 @@ efficient number format).
 </DL>
 
 
-<H1>Design Rationale</H1>
+<h2>Design Rationale</h2>
 
 <H3>Why not combine <code>random-integer</code> and
 <code>random-real</code>?</H3>
@@ -383,7 +381,7 @@ The procedure <code>random-real</code> does not return
 <code>(log (- 1 </code><I>x</I>)<code>)</code>
 without the danger of a numerical exception.
 
-<H1>Implementation</H1>
+<h2>Implementation</h2>
 
 <H3>Choice of generator</H3>
 
@@ -550,7 +548,7 @@ about their favorite generators and check their implementation.<p>
 
 
 
-<H1>Recommended Usage Patterns</H1>
+<h2>Recommended Usage Patterns</h2>
 
 Unless the functionality defined in this SRFI is sufficient,
 an application has to implement more procedures to construct
@@ -662,14 +660,14 @@ affect the output of <code>random-normal</code> immediately!
 For the algorithm refer to Knuth's "The Art of Computer Programming",
 Vol. II, 2nd ed., Algorithm P of Section 3.4.1.C.
 
-<H1>Acknowledgements</H1>
+<h2>Acknowledgements</h2>
 
 I would like to thank all people who have participated in the discussion,
 in particular Brad Lucier and Pierre l'Ecuyer.
 Their contributions have greatly improved the design of this SRFI.
 Moreover, Brad has optimized the Gambit implementation quite substantially.
 
-<H1>References</H1>
+<h2>References</h2>
 
 <OL>
 
@@ -780,7 +778,7 @@ Moreover, Brad has optimized the Gambit implementation quite substantially.
 </OL>
 
 
-<H1>Copyright</H1>
+<h2>Copyright</h2>
 <p>Copyright (C) Sebastian Egner (2002). All Rights Reserved.</p>
 
 <p>
